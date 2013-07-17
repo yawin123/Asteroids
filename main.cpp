@@ -7,9 +7,6 @@
 using namespace miniwin;
 using namespace std;
 
-
-
-
 //Utilidades y globales
     list<Asteroide*> A;
     list<Asteroide*>::iterator Ait;
