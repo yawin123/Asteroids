@@ -7,102 +7,114 @@
 using namespace miniwin;
 using namespace std;
 
+
+class Juego
+{
 //Utilidades y globales
+    Nave nave;
     list<Asteroide*> A;
     list<Asteroide*>::iterator Ait;
     list<Laser*> L;
     list<Laser*>::iterator Lit;
 
-    void frame(Nave& nave)
-    {
-        borra();
-        nave.actualiza();
+    public:
+        Juego():nave(ANCHO/2,ALTO/2,270)
+        {
+            srand(time(0)); //Ponemos la semilla
+            vredimensiona(ANCHO, ALTO);
 
-        //Actualizamos los laseres
-            Lit=L.begin();
-            while(Lit!=L.end())
+            for(int i=0;i<5;i++)
             {
-                if((*Lit)->ha_chocado())
-                {
-                    delete(*Lit);
-                    Lit=L.erase(Lit);
-                }
-                else
-                {
-                    Lit++;
-                }
+                A.push_back(new Asteroide());
             }
-            for(Lit=L.begin();Lit!=L.end();Lit++)
-            {
-                (*Lit)->actualiza();
-            }
+        }
 
-        //Actualizamos los asteroides
-            Ait=A.begin();
-            while(Ait!=A.end())
+        void cuerpo(int& t)
+        {
+            switch(t)
             {
-                if((*Ait)->ha_chocado())
-                {
-                    delete (*Ait);
-                    Ait=A.erase(Ait);
-                }
-                else
-                {
-                    Ait++;
-                }
+                case IZQUIERDA:
+                    nave.rota(-10);
+                    break;
+                case DERECHA:
+                    nave.rota(10);
+                    break;
+                case ARRIBA:
+                    nave.acelera();
+                    break;
+                case ESPACIO:
+                    L.push_back(new Laser(nave));
+                    break;
             }
-            for(Ait=A.begin();Ait!=A.end();Ait++)
-            {
-                (*Ait)->actualiza(nave);
+        }
 
-                /*for(Lit=L.begin();Lit!=L.end();Lit++)
+        void frame()
+        {
+            borra();
+            nave.actualiza();
+
+            //Actualizamos los laseres
+                Lit=L.begin();
+                while(Lit!=L.end())
                 {
-                   (*Ait)->actualiza((*Lit));
-                }*/
-                (*Ait)->actualiza();
-            }
+                    if((*Lit)->ha_chocado())
+                    {
+                        delete(*Lit);
+                        Lit=L.erase(Lit);
+                    }
+                    else
+                    {
+                        Lit++;
+                    }
+                }
+                for(Lit=L.begin();Lit!=L.end();Lit++)
+                {
+                    (*Lit)->actualiza();
+                }
 
-        refresca();
-    }
-//End utilidades y globales
+            //Actualizamos los asteroides
+                Ait=A.begin();
+                while(Ait!=A.end())
+                {
+                    if((*Ait)->ha_chocado())
+                    {
+                        delete (*Ait);
+                        Ait=A.erase(Ait);
+                    }
+                    else
+                    {
+                        Ait++;
+                    }
+                }
+                for(Ait=A.begin();Ait!=A.end();Ait++)
+                {
+                    (*Ait)->actualiza(nave);
+
+                    /*for(Lit=L.begin();Lit!=L.end();Lit++)
+                    {
+                        (*Ait)->actualiza((*Lit));
+                    }*/
+
+                    (*Ait)->actualiza();
+                }
+
+            refresca();
+        }
+};
 
 int main()
 {
-    srand(time(0)); //Ponemos la semilla
-
-    vredimensiona(ANCHO, ALTO);
-    Nave nave(ANCHO/2,ALTO/2,270);
-
-    for(int i=0;i<5;i++)
-    {
-        A.push_back(new Asteroide());
-    }
-
-    frame(nave);
-
     int t;
-    do
-    {
-        switch(t)
-        {
-            case IZQUIERDA:
-                nave.rota(-10);
-                break;
-            case DERECHA:
-                nave.rota(10);
-                break;
-            case ARRIBA:
-                nave.acelera();
-                break;
-            case ESPACIO:
-                L.push_back(new Laser(nave));
-                break;
-        }
+    Juego *asteroids=new Juego();
+    asteroids->frame();
 
-        frame(nave);
+   do
+   {
+        t=tecla();
+        asteroids->cuerpo(t);
+        asteroids->frame();
 
         espera(30);
-        t=tecla();
     }while(t!=ESCAPE);
 
     refresca();
