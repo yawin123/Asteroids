@@ -10,7 +10,6 @@ using namespace std;
 
 class Juego
 {
-//Utilidades y globales
     Nave nave;
     list<Asteroide*> A;
     list<Asteroide*>::iterator Ait;
